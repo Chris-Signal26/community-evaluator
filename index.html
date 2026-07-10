@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Appetite &amp; Readiness Evaluator — Signal Ventures</title>
+<style>
+:root{
+  --navy:#12263a; --navy2:#1d3a57; --accent:#2e86de; --bg:#f4f6f9; --card:#ffffff;
+  --ink:#1b2733; --muted:#5c6b7a; --line:#dde4ec;
+  --go:#1e8e3e; --caution:#e8a013; --nogo:#c5221f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45}
+header{background:var(--navy);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+header h1{font-size:1.05rem;font-weight:600;letter-spacing:.02em}
+header .sub{font-size:.75rem;opacity:.75}
+.container{max-width:880px;margin:0 auto;padding:16px 14px 90px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{font-size:1rem;color:var(--navy);margin-bottom:10px}
+h3{font-size:.95rem;color:var(--navy)}
+.btn{display:inline-block;border:none;border-radius:8px;padding:11px 16px;font-size:.92rem;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
+.btn.secondary{background:#e8eef5;color:var(--navy)}
+.btn.danger{background:#fdecea;color:var(--nogo)}
+.btn.small{padding:7px 12px;font-size:.82rem}
+.btn:active{transform:scale(.98)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text],input[type=date],textarea,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:44px}
+label.fld{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.04em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+/* profile list */
+.plist-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 6px;border-bottom:1px solid var(--line);cursor:pointer}
+.plist-item:last-child{border-bottom:none}
+.plist-item:hover{background:#f7fafd}
+.pname{font-weight:600}
+.pmeta{font-size:.78rem;color:var(--muted)}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700;color:#fff;white-space:nowrap}
+.chip.go{background:var(--go)} .chip.caution{background:var(--caution)} .chip.nogo{background:var(--nogo)} .chip.na{background:#9aa7b4}
+/* section */
+.section-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--navy);padding-bottom:6px;margin-bottom:6px}
+.section-head .wt{font-size:.78rem;color:var(--muted);font-weight:600}
+.q{padding:12px 0;border-bottom:1px dashed var(--line)}
+.q:last-child{border-bottom:none}
+.q .qt{font-weight:600;font-size:.92rem;margin-bottom:8px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:.88rem;background:#fff}
+.opt:hover{border-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:#eaf3fd;font-weight:600}
+.opt .pt{margin-left:auto;font-size:.72rem;color:var(--muted);white-space:nowrap}
+.qnote{margin-top:7px}
+.qnote textarea{font-size:.85rem;min-height:36px}
+/* flags */
+.flag{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:7px;font-size:.88rem;background:#fff}
+.flag input{margin-top:3px;transform:scale(1.25)}
+.flag.hard.on{border-color:var(--nogo);background:#fdecea}
+.flag.soft.on{border-color:var(--caution);background:#fdf3df}
+.flag .tag{font-size:.68rem;font-weight:800;letter-spacing:.05em;padding:2px 6px;border-radius:4px;color:#fff;margin-left:auto;white-space:nowrap}
+.tag.hard{background:var(--nogo)} .tag.soft{background:var(--caution)}
+/* score bar */
+#scorebar{position:fixed;bottom:0;left:0;right:0;background:var(--navy);color:#fff;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:12px;z-index:50}
+#scorebar .big{font-size:1.3rem;font-weight:800}
+#scorebar .lbl{font-size:.72rem;opacity:.75}
+/* report */
+.rpt-head{border-bottom:3px solid var(--navy);padding-bottom:12px;margin-bottom:16px}
+.rpt-head .brand{font-size:.75rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.rpt-head h2{font-size:1.5rem;margin:4px 0 2px}
+.rpt-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-size:.85rem;margin-top:10px}
+.rpt-meta div span{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.verdict-box{display:flex;align-items:center;gap:16px;padding:16px;border-radius:12px;margin-bottom:16px;color:#fff}
+.verdict-box.go{background:var(--go)} .verdict-box.caution{background:var(--caution)} .verdict-box.nogo{background:var(--nogo)}
+.verdict-box .num{font-size:2.4rem;font-weight:800;line-height:1}
+.verdict-box .vl{font-size:1.2rem;font-weight:800}
+.verdict-box .vs{font-size:.85rem;opacity:.9}
+.catrow{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:.88rem}
+.catrow .cn{flex:0 0 240px}
+@media(max-width:560px){.catrow{flex-wrap:wrap}.catrow .cn{flex:1 0 100%}}
+.bar{flex:1;height:14px;background:#e8edf3;border-radius:7px;overflow:hidden;min-width:120px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:7px}
+.catrow .cs{flex:0 0 74px;text-align:right;font-weight:700}
+.rpt-flag{padding:8px 12px;border-radius:8px;margin-bottom:6px;font-size:.88rem}
+.rpt-flag.hard{background:#fdecea;border-left:4px solid var(--nogo)}
+.rpt-flag.soft{background:#fdf3df;border-left:4px solid var(--caution)}
+.gap{padding:7px 12px;border-left:4px solid var(--caution);background:#fbf8f1;margin-bottom:6px;font-size:.86rem;border-radius:0 8px 8px 0}
+.ansrow{padding:7px 0;border-bottom:1px dashed var(--line);font-size:.85rem}
+.ansrow .aq{color:var(--muted)}
+.ansrow .aa{font-weight:600}
+.ansrow .an{font-style:italic;color:var(--muted);font-size:.8rem}
+.footer-note{font-size:.72rem;color:var(--muted);margin-top:20px;border-top:1px solid var(--line);padding-top:8px}
+.hidden{display:none!important}
+@media print{
+  header,#scorebar,.noprint{display:none!important}
+  body{background:#fff}
+  .container{max-width:100%;padding:0}
+  .card{border:none;padding:0;margin-bottom:14px}
+  .opt,.flag{border:none;padding:2px 0}
+  @page{margin:16mm}
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Community Appetite &amp; Readiness Evaluator</h1>
+    <div class="sub">Signal Ventures · Data Center Community Profiles</div>
+  </div>
+  <div class="row noprint">
+    <button class="btn small secondary" onclick="goHome()">My Profiles</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ============ HOME / PROFILE LIST ============ -->
+  <div id="view-home">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2>Community Profiles</h2>
+        <button class="btn" onclick="newProfile()">+ New Profile</button>
+      </div>
+      <div id="plist" style="margin-top:8px"></div>
+    </div>
+    <div class="card noprint">
+      <h2>Backup &amp; Transfer</h2>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Profiles are stored on this device. Use export/import to move them between your phone and laptop.</p>
+      <div class="row">
+        <button class="btn small secondary" onclick="exportAll()">Export All (JSON)</button>
+        <button class="btn small secondary" onclick="document.getElementById('importfile').click()">Import</button>
+        <input type="file" id="importfile" accept=".json" class="hidden" onchange="importFile(this)">
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FORM ============ -->
+  <div id="view-form" class="hidden">
+    <div class="card">
+      <h2>Community Information</h2>
+      <div class="grid2">
+        <div><label class="fld">Community / Profile Name *</label><input type="text" id="m_community" placeholder="e.g., Douglas County — West Corridor"></div>
+        <div><label class="fld">State *</label><input type="text" id="m_state" placeholder="e.g., Georgia"></div>
+        <div><label class="fld">County *</label><input type="text" id="m_county" placeholder="e.g., Douglas County"></div>
+        <div><label class="fld">City</label><input type="text" id="m_city" placeholder="e.g., Douglasville"></div>
+        <div><label class="fld">Primary Electric Utility</label><input type="text" id="m_utility" placeholder="e.g., Georgia Power / EMC"></div>
+        <div><label class="fld">Evaluator</label><input type="text" id="m_evaluator" placeholder="e.g., Chris Pumphrey"></div>
+        <div><label class="fld">Evaluation Date</label><input type="date" id="m_date"></div>
+        <div><label class="fld">Population (approx.)</label><input type="text" id="m_pop" placeholder="optional"></div>
+      </div>
+      <label class="fld">General Notes</label>
+      <textarea id="m_notes" placeholder="Context, key contacts, active projects…"></textarea>
+    </div>
+
+    <div id="sections"></div>
+
+    <div class="card">
+      <div class="section-head"><h3>Red Flags</h3><span class="wt">Override the score</span></div>
+      <p style="font-size:.82rem;color:var(--muted);margin:6px 0 10px">Hard flags force a <b>No-Go</b>. Soft flags cap the verdict at <b>Caution</b>. An active moratorium answered above is flagged automatically.</p>
+      <div id="flags"></div>
+    </div>
+
+    <div class="row noprint" style="margin:4px 0 20px">
+      <button class="btn" onclick="saveAndReport()">Save &amp; View Report</button>
+      <button class="btn secondary" onclick="saveProfile(true)">Save</button>
+      <button class="btn danger" onclick="deleteCurrent()">Delete</button>
+    </div>
+  </div>
+
+  <!-- ============ REPORT ============ -->
+  <div id="view-report" class="hidden">
+    <div class="row noprint" style="margin-bottom:12px">
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+      <button class="btn secondary" onclick="openProfile(currentId)">Edit Profile</button>
+    </div>
+    <div class="card" id="report"></div>
+  </div>
+
+</div>
+
+<div id="scorebar" class="noprint">
+  <div><div class="lbl">CURRENT SCORE</div><div class="big" id="sb_score">0</div></div>
+  <div><div class="lbl">VERDICT</div><span class="chip na" id="sb_verdict">—</span></div>
+  <div><div class="lbl">ANSWERED</div><div class="big" id="sb_done" style="font-size:1rem;margin-top:4px">0/0</div></div>
+</div>
+
+<script>
+/* ================= MODEL ================= */
+const MODEL = [
+ {id:"pol", name:"Political & Leadership Appetite", weight:25, qs:[
+  {id:"pol1", t:"Elected leadership stance on data centers", o:[["Active champion(s) on the board/council",4],["Generally supportive",3],["Neutral / no stated position",2],["Divided",1],["Hostile",0]]},
+  {id:"pol2", t:"Prior votes on data center or large industrial projects", o:[["Approved multiple projects",4],["Approved at least one",3],["No history",2],["Mixed record",1],["Denied a recent project",0]]},
+  {id:"pol3", t:"Moratorium history", o:[["Never had one",4],["Expired more than 2 years ago",3],["Recently lifted (within 2 years)",1],["Active moratorium or ban",0]], hardFlagIdx:3},
+  {id:"pol4", t:"Election / leadership turnover risk", o:[["Stable — no near-term elections",4],["Election coming, data centers not an issue",3],["Election coming, data centers are an issue",1],["Imminent turnover with hostile challengers",0]]},
+  {id:"pol5", t:"Development authority engagement", o:[["Actively recruiting data centers",4],["Engaged and supportive",3],["Aware but passive",2],["Unengaged",1],["Opposed",0]]},
+  {id:"pol6", t:"Planning staff attitude and capacity", o:[["Experienced with the use and supportive",3.5],["Competent and neutral",3],["Limited experience but willing",2],["Understaffed / inexperienced",1],["Resistant",0]]},
+  {id:"pol7", t:"Chamber of Commerce engagement", o:[["Active advocate for data center investment",4],["Supportive",3],["Neutral / unengaged",2],["Skeptical",1],["Opposed",0]]}
+ ]},
+ {id:"sen", name:"Community Sentiment", weight:20, qs:[
+  {id:"sen1", t:"Public sentiment", o:[["Educated and prepared",4],["Neutral",3],["Emerging concern",2],["Vocal concern",1],["Organized opposition",0]]},
+  {id:"sen2", t:"Opposition groups and their traction", o:[["None",4],["Individual critics only",3],["Informal group, little traction",2],["Organized group, some traction",1],["Organized group with traction on the board/council",0]]},
+  {id:"sen3", t:"Local media tone on data centers / growth", o:[["Positive",4],["Balanced",3],["No coverage",2],["Skeptical",1],["Hostile",0]]},
+  {id:"sen4", t:"History of contested hearings on industrial projects", o:[["Smooth approvals",4],["Minor pushback",3],["No history",2],["Occasionally contested",1],["Routinely contested",0]]},
+  {id:"sen5", t:"Public FAQ and communications materials", o:[["Complete and published",4],["Drafted",3],["Planned",2],["None, but leadership is open",1],["None, and leadership is resistant",0]]}
+ ]},
+ {id:"zon", name:"Zoning & Entitlement Certainty", weight:20, qs:[
+  {id:"zon1", t:"Data center defined as a distinct use in code", o:[["Fully defined, including accessory infrastructure",4],["Defined, but gaps remain",3],["Draft definitions in progress",2],["Undefined / treated as warehouse",1],["Explicitly restricted",0]]},
+  {id:"zon2", t:"Approval pathway", o:[["Permitted by right",4],["Administrative approval",3],["Conditional with objective standards",2],["Discretionary rezoning required",1],["No viable pathway",0]]},
+  {id:"zon3", t:"Objective written standards (noise, setbacks, screening, lighting)", o:[["Comprehensive and measurable",4],["Most impacts covered",3],["Partial",2],["Vague catch-all language",1],["None",0]]},
+  {id:"zon4", t:"Estimated timeline to approval", o:[["Under 90 days",4],["90–180 days",3],["6–12 months",2],["Over 12 months",1],["Unpredictable",0]]},
+  {id:"zon5", t:"Panic-zoning or midstream rule changes", o:[["None",4],["Minor targeted updates only",3],["Ordinance under review",2],["Recent reactionary changes",1],["Pending restrictive ordinance",0]]}
+ ]},
+ {id:"inf", name:"Infrastructure Readiness", weight:20, qs:[
+  {id:"inf1", t:"Utility coordination status", o:[["Capacity reserved / committed",4],["Load study completed",3],["Active planning",2],["Initial discussions",1],["No coordination",0]]},
+  {id:"inf2", t:"Power capacity and interconnection outlook", o:[["Capacity available, interconnect < 24 months",4],["Planned capacity, 2–4 years",3],["Constrained but a path exists",2],["Major constraints",1],["Unknown",0]]},
+  {id:"inf3", t:"Water source, capacity, and cooling posture", o:[["Capacity confirmed + reclaimed/alternative options",4],["Adequate municipal supply",3],["Adequate but politically sensitive",2],["Constrained",1],["Unknown or inadequate",0]]},
+  {id:"inf4", t:"Fiber routes and redundancy", o:[["Two or more physically diverse routes",4],["Multiple carriers, redundancy achievable",3],["Single trunk nearby",2],["Limited fiber presence",1],["Unknown",0]]},
+  {id:"inf5", t:"Transportation and oversized-load access", o:[["Interstate access + approved routes identified",4],["Good access, coordination needed",3],["Adequate arterials",2],["Constrained routes",1],["Poor access",0]]},
+  {id:"inf6", t:"Designated sites for data center development", o:[["Certified / designated sites ready",4],["Sites identified and properly zoned",3],["Sites identified but not zoned",2],["Informal candidate sites only",1],["No sites identified",0]]}
+ ]},
+ {id:"eco", name:"Economic & Workforce Alignment", weight:10, qs:[
+  {id:"eco1", t:"Tax / abatement posture and fiscal expectations", o:[["Competitive incentives + clear expectations",4],["Open to negotiation",3],["Undefined",2],["Heavy demands / CBA-first posture",1],["Hostile tax posture",0]]},
+  {id:"eco2", t:"Workforce pipeline (trades, technical colleges)", o:[["Technical college partnership + deep trades base",4],["Good regional trades capacity",3],["Adequate",2],["Thin",1],["Weak",0]]},
+  {id:"eco3", t:"Existing industrial base / nearby data centers", o:[["Existing data centers nearby",4],["Strong industrial base",3],["Some industrial presence",2],["Limited",1],["None",0]]}
+ ]},
+ {id:"env", name:"Environmental Stewardship Posture", weight:5, qs:[
+  {id:"env1", t:"Stewardship standards in place", o:[["Advanced stewardship planning",4],["Water + energy considerations adopted",3],["Basic compliance only",2],["Minimal",1],["None",0]]},
+  {id:"env2", t:"Posture toward cooling / water disclosure", o:[["Constructive, early-engagement approach",4],["Reasonable",3],["Undeveloped",2],["Reactive",1],["Obstructive",0]]}
+ ]}
+];
+
+const FLAGS = [
+ {id:"f1", type:"hard", t:"Active moratorium or ban on data centers"},
+ {id:"f2", type:"hard", t:"Pending restrictive ordinance likely to pass"},
+ {id:"f3", type:"hard", t:"Refusal to coordinate with the electric utility"},
+ {id:"f4", type:"hard", t:"Leadership publicly committed against data centers"},
+ {id:"f5", type:"soft", t:"Organized opposition with traction on the board/council"},
+ {id:"f6", type:"soft", t:"History of ad hoc / arbitrary rezoning practices"},
+ {id:"f7", type:"soft", t:"Election within 6 months with data centers as an issue"},
+ {id:"f8", type:"soft", t:"Hostile or unpredictable tax posture"}
+];
+
+/* ================= STORAGE ================= */
+const KEY = "sv_dc_profiles_v1";
+let currentId = null;
+function loadAll(){ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}} }
+function storeAll(d){ localStorage.setItem(KEY, JSON.stringify(d)); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ================= SCORING ================= */
+function computeScore(p){
+  let total=0, answered=0, totalQ=0, cats=[], gaps=[];
+  MODEL.forEach(sec=>{
+    let pts=0, max=0;
+    sec.qs.forEach(q=>{
+      totalQ++;
+      const maxOpt = Math.max(...q.o.map(o=>o[1]));
+      max += maxOpt;
+      const a = p.answers[q.id];
+      if(a!==undefined && a!==null){
+        answered++;
+        pts += q.o[a][1];
+        if(q.o[a][1] <= 1) gaps.push({sec:sec.name, q:q.t, ans:q.o[a][0]});
+      }
+    });
+    const score = max? (pts/max)*sec.weight : 0;
+    cats.push({name:sec.name, weight:sec.weight, score:Math.round(score*10)/10});
+    total += score;
+  });
+  total = Math.round(total*10)/10;
+  // flags: manual + auto (moratorium answer)
+  const active = FLAGS.filter(f=>p.flags && p.flags[f.id]).map(f=>({...f}));
+  MODEL.forEach(sec=>sec.qs.forEach(q=>{
+    if(q.hardFlagIdx!==undefined && p.answers[q.id]===q.hardFlagIdx){
+      if(!active.some(f=>f.id==="f1")) active.push({id:"auto_"+q.id, type:"hard", t:"Active moratorium or ban (from questionnaire answer)"});
+    }
+  }));
+  const hasHard = active.some(f=>f.type==="hard");
+  const hasSoft = active.some(f=>f.type==="soft");
+  let verdict;
+  if(hasHard) verdict="No-Go";
+  else if(total>=75) verdict = hasSoft ? "Caution" : "Go";
+  else if(total>=50) verdict="Caution";
+  else verdict="No-Go";
+  return {total, cats, verdict, flags:active, answered, totalQ, gaps};
+}
+function vclass(v){ return v==="Go"?"go":(v==="Caution"?"caution":"nogo"); }
+
+/* ================= VIEWS ================= */
+function show(id){
+  ["view-home","view-form","view-report"].forEach(v=>document.getElementById(v).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  document.getElementById("scorebar").style.display = (id==="view-form") ? "flex" : "none";
+  window.scrollTo(0,0);
+}
+function goHome(){ if(!document.getElementById("view-form").classList.contains("hidden")) saveProfile(false); renderHome(); show("view-home"); }
+
+function renderHome(){
+  const all = loadAll();
+  const list = Object.values(all).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const el = document.getElementById("plist");
+  if(!list.length){ el.innerHTML = '<p style="color:var(--muted);font-size:.9rem;padding:10px 0">No profiles yet. Create your first community profile.</p>'; return; }
+  el.innerHTML = list.map(p=>{
+    const r = computeScore(p);
+    const loc = [p.meta.city, p.meta.county, p.meta.state].filter(Boolean).join(", ");
+    const done = r.answered===r.totalQ;
+    const chip = done ? `<span class="chip ${vclass(r.verdict)}">${r.verdict} · ${r.total}</span>` : `<span class="chip na">${r.answered}/${r.totalQ} answered</span>`;
+    return `<div class="plist-item" onclick="openProfile('${p.id}')">
+      <div><div class="pname">${esc(p.meta.community)||"(unnamed)"}</div><div class="pmeta">${esc(loc)} · updated ${new Date(p.updated).toLocaleDateString()}</div></div>
+      ${chip}</div>`;
+  }).join("");
+}
+
+function newProfile(){
+  const all = loadAll();
+  const id = uid();
+  all[id] = {id, meta:{community:"",city:"",county:"",state:"",utility:"",evaluator:"",date:new Date().toISOString().slice(0,10),pop:"",notes:""}, answers:{}, qnotes:{}, flags:{}, updated:Date.now()};
+  storeAll(all);
+  openProfile(id);
+}
+
+function openProfile(id){
+  currentId = id;
+  const p = loadAll()[id];
+  if(!p) return goHome();
+  ["community","city","county","state","utility","evaluator","date","pop","notes"].forEach(k=>{
+    document.getElementById("m_"+k).value = p.meta[k]||"";
+  });
+  renderSections(p);
+  renderFlags(p);
+  show("view-form");
+  updateScorebar();
+}
+
+function renderSections(p){
+  document.getElementById("sections").innerHTML = MODEL.map(sec=>`
+    <div class="card">
+      <div class="section-head"><h3>${sec.name}</h3><span class="wt">${sec.weight} pts</span></div>
+      ${sec.qs.map(q=>`
+        <div class="q" id="q_${q.id}">
+          <div class="qt">${q.t}</div>
+          <div class="opts">${q.o.map((o,i)=>`
+            <div class="opt ${p.answers[q.id]===i?'sel':''}" onclick="pick('${q.id}',${i})">${o[0]}<span class="pt">${o[1]} pts</span></div>`).join("")}
+          </div>
+          <div class="qnote"><textarea placeholder="Notes / evidence (optional)" id="n_${q.id}" onchange="noteChange('${q.id}',this.value)">${esc(p.qnotes[q.id]||"")}</textarea></div>
+        </div>`).join("")}
+    </div>`).join("");
+}
+
+function renderFlags(p){
+  document.getElementById("flags").innerHTML = FLAGS.map(f=>`
+    <label class="flag ${f.type} ${p.flags[f.id]?'on':''}" id="fl_${f.id}">
+      <input type="checkbox" ${p.flags[f.id]?'checked':''} onchange="flagChange('${f.id}',this.checked)">
+      <span>${f.t}</span><span class="tag ${f.type}">${f.type.toUpperCase()}</span>
+    </label>`).join("");
+}
+
+function pick(qid,i){
+  const all = loadAll(); const p = all[currentId];
+  p.answers[qid] = (p.answers[qid]===i) ? undefined : i;
+  if(p.answers[qid]===undefined) delete p.answers[qid];
+  p.updated = Date.now(); storeAll(all);
+  // update UI
+  const qEl = document.getElementById("q_"+qid);
+  qEl.querySelectorAll(".opt").forEach((el,idx)=>el.classList.toggle("sel", p.answers[qid]===idx));
+  updateScorebar();
+}
+function noteChange(qid,val){ const all=loadAll(); all[currentId].qnotes[qid]=val; all[currentId].updated=Date.now(); storeAll(all); }
+function flagChange(fid,on){ const all=loadAll(); all[currentId].flags[fid]=on; all[currentId].updated=Date.now(); storeAll(all); document.getElementById("fl_"+fid).classList.toggle("on",on); updateScorebar(); }
+
+function collectMeta(p){
+  ["community","city","county","state","utility","evaluator","date","pop","notes"].forEach(k=>{
+    p.meta[k] = document.getElementById("m_"+k).value.trim();
+  });
+}
+function saveProfile(toast){
+  const all = loadAll(); const p = all[currentId]; if(!p) return;
+  collectMeta(p); p.updated = Date.now(); storeAll(all);
+  if(toast){ const b=event&&event.target; if(b){const t=b.textContent;b.textContent="Saved ✓";setTimeout(()=>b.textContent=t,1200);} }
+}
+function deleteCurrent(){
+  if(!confirm("Delete this profile permanently?")) return;
+  const all = loadAll(); delete all[currentId]; storeAll(all); goHome();
+}
+function updateScorebar(){
+  const p = loadAll()[currentId]; if(!p) return;
+  const r = computeScore(p);
+  document.getElementById("sb_score").textContent = r.total;
+  document.getElementById("sb_done").textContent = r.answered+"/"+r.totalQ;
+  const v = document.getElementById("sb_verdict");
+  if(r.answered===0){ v.textContent="—"; v.className="chip na"; }
+  else { v.textContent=r.verdict; v.className="chip "+vclass(r.verdict); }
+}
+
+/* ================= REPORT ================= */
+function saveAndReport(){ saveProfile(false); renderReport(); show("view-report"); }
+function renderReport(){
+  const p = loadAll()[currentId]; const r = computeScore(p);
+  const m = p.meta;
+  const loc = [m.city, m.county, m.state].filter(Boolean).join(", ");
+  const vsub = {Go:"Favorable conditions. Community shows appetite and readiness for data center development.",
+    Caution:"Proceed with targeted risk mitigation. Address the gaps and flags below before committing resources.",
+    "No-Go":"Conditions are not favorable. Fundamental political, regulatory, or infrastructure barriers exist."}[r.verdict];
+  const incomplete = r.answered < r.totalQ ? `<p style="color:var(--caution);font-weight:600;font-size:.85rem;margin-bottom:10px">⚠ Partial evaluation: ${r.answered} of ${r.totalQ} questions answered.</p>` : "";
+  document.getElementById("report").innerHTML = `
+    <div class="rpt-head">
+      <div class="brand">Signal Ventures · Community Appetite &amp; Readiness Profile</div>
+      <h2>${esc(m.community)||"(unnamed community)"}</h2>
+      <div style="color:var(--muted);font-size:.9rem">${esc(loc)}</div>
+      <div class="rpt-meta">
+        <div><span>County</span>${esc(m.county)||"—"}</div>
+        <div><span>City</span>${esc(m.city)||"—"}</div>
+        <div><span>State</span>${esc(m.state)||"—"}</div>
+        <div><span>Utility</span>${esc(m.utility)||"—"}</div>
+        <div><span>Evaluator</span>${esc(m.evaluator)||"—"}</div>
+        <div><span>Date</span>${esc(m.date)||"—"}</div>
+      </div>
+    </div>
+    ${incomplete}
+    <div class="verdict-box ${vclass(r.verdict)}">
+      <div class="num">${r.total}<span style="font-size:1rem;font-weight:600;opacity:.8">/100</span></div>
+      <div><div class="vl">${r.verdict.toUpperCase()}</div><div class="vs">${vsub}</div></div>
+    </div>
+    <h3 style="margin:14px 0 10px">Category Breakdown</h3>
+    ${r.cats.map(c=>`<div class="catrow"><div class="cn">${c.name}</div><div class="bar"><i style="width:${Math.min(100,c.score/c.weight*100)}%"></i></div><div class="cs">${c.score} / ${c.weight}</div></div>`).join("")}
+    ${r.flags.length?`<h3 style="margin:18px 0 10px">Red Flags</h3>${r.flags.map(f=>`<div class="rpt-flag ${f.type}"><b>${f.type==="hard"?"HARD":"SOFT"}</b> — ${f.t}</div>`).join("")}`:""}
+    ${r.gaps.length?`<h3 style="margin:18px 0 10px">Gaps to Address</h3>${r.gaps.map(g=>`<div class="gap"><b>${g.sec}:</b> ${g.q} — <i>${g.ans}</i></div>`).join("")}`:""}
+    ${m.notes?`<h3 style="margin:18px 0 8px">General Notes</h3><p style="font-size:.88rem">${esc(m.notes)}</p>`:""}
+    <h3 style="margin:18px 0 8px">Detailed Responses</h3>
+    ${MODEL.map(sec=>`
+      <div style="margin-bottom:12px"><b style="font-size:.9rem;color:var(--navy)">${sec.name}</b>
+      ${sec.qs.map(q=>{
+        const a = p.answers[q.id];
+        const note = p.qnotes[q.id];
+        return `<div class="ansrow"><span class="aq">${q.t}:</span> <span class="aa">${a!==undefined?q.o[a][0]:"— not answered —"}</span>${note?`<div class="an">Note: ${esc(note)}</div>`:""}</div>`;
+      }).join("")}</div>`).join("")}
+    <div class="footer-note">Prepared with the Signal Ventures Community Appetite &amp; Readiness Evaluator. Scores reflect conditions as of the evaluation date and should be revalidated after material political, zoning, or infrastructure changes. Confidential — internal use.</div>`;
+}
+
+/* ================= EXPORT / IMPORT ================= */
+function exportAll(){
+  const blob = new Blob([JSON.stringify(loadAll(),null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "signal_community_profiles_"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+}
+function importFile(inp){
+  const f = inp.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      const all = loadAll();
+      let n=0;
+      Object.values(data).forEach(p=>{ if(p && p.id && p.meta){ all[p.id]=p; n++; } });
+      storeAll(all); renderHome();
+      alert("Imported "+n+" profile(s). Existing profiles with the same ID were updated.");
+    }catch(err){ alert("Could not read that file: "+err.message); }
+  };
+  rd.readAsText(f);
+  inp.value="";
+}
+
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* init */
+renderHome(); show("view-home");
+</script>
+</body>
+</html>
